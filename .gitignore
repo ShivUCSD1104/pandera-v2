@@ -4,8 +4,6 @@ flask-compute/OrderFlowCanyon/.env
 Frontend/node-server/node_modules/*
 Frontend/node_modules/*
 .env
-package-lock.json
-package.json
 node_modules/.package-lock.json
 node_modules/@types/react/canary.d.ts
 node_modules/@types/react/compiler-runtime.d.ts
