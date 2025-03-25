@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-tomorrow), sans-serif;
+  cursor: url('/cursor.svg'), auto;
+}
+
+@layer utilities {
+  .bg-five-color-gradient {
+    background: linear-gradient(90deg, #f7f7f5 1%, #fef9c3,#d1fae5, #dbeafe, #f9f9f9 99%);
+  }
+  .white-cursor{
+    cursor: url('/cursor-white.svg'), auto;
+  }
+}
