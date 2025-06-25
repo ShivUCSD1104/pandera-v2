@@ -1,6 +1,8 @@
 # CUDA Kernels for Autocorrelation and Reduction
 
 This package provides high-performance CUDA implementations of autocorrelation and sum reduction operations, designed to accelerate scientific computing tasks.
+**PyPI**: [cuda-kernels](https://pypi.org/project/cuda-kernels/0.1.0/)  
+**Source Code**: [GitHub Repository](https://github.com/AstuteFern/cuda-toolkit/tree/main)
 
 ## Installation
 
