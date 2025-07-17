@@ -1,5 +1,6 @@
 import sys
 import os
+import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -8,6 +9,13 @@ sys.path.insert(0, IVSURFACE_PATH)
 
 app = Flask(__name__)
 CORS(app)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 @app.route('/compute', methods=['POST'])
 def compute():
@@ -46,6 +54,28 @@ def compute():
                 parameters.get('Start Date'),
                 parameters.get('End Date')
             )
+        elif graph_type == 'GreeksLandscape':
+            from GreeksLandscape.main import generate_greeks_landscape_html
+            logger.info(f"Generating Greeks Landscape for ticker: {parameters.get('Ticker', 'AAPL')}, view: {parameters.get('Greeks View', 'All')}")
+            fig_json = generate_greeks_landscape_html(
+                parameters.get('Ticker', 'AAPL'),
+                parameters.get('Greeks View', 'All'),
+                parameters.get('Start Date'),
+                parameters.get('End Date')
+            )
+            
+            # Handle Greeks Landscape specific errors
+            if isinstance(fig_json, dict) and "error" in fig_json:
+                error_type = fig_json.get("type", "unknown_error")
+                error_message = fig_json.get("error", "Unknown error occurred")
+                logger.error(f"Greeks Landscape Error ({error_type}): {error_message}")
+                
+                if error_type in ["data_error", "generation_error"]:
+                    return jsonify({"error": error_message}), 404
+                else:
+                    return jsonify({"error": error_message}), 500
+            
+            logger.info(f"Successfully generated Greeks Landscape for {parameters.get('Ticker', 'AAPL')}")
         else:
             print("❌ Invalid graph type")
             return jsonify({"error": "Invalid graph type"}), 400

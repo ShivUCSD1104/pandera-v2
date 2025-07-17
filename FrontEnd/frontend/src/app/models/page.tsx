@@ -57,6 +57,19 @@ export default function Models() {
         },
       ],
     },
+    {
+      title: 'Options Greeks Landscape',
+      image: '/greeks-landscape.png',
+      type: 'GreeksLandscape',
+      constraints: [
+        { label: 'Ticker', options: ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'] },
+        { label: 'Greeks View', options: ['Delta', 'Gamma', 'Theta', 'Vega', 'All'] },
+        { 
+          label: 'Time Period', 
+          options: ['1 month', '3 months', '6 months', '1 year'] 
+        },
+      ],
+    },
   ];
 
   const openModal = (cardData: CardData) => {

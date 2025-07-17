@@ -44,3 +44,6 @@ node_modules/csstype/index.js.flow
 node_modules/csstype/LICENSE
 node_modules/csstype/package.json
 node_modules/csstype/README.md
+.kiro/specs/greeks-sentiment-models/design.md
+.kiro/specs/greeks-sentiment-models/tasks.md
+.kiro/specs/greeks-sentiment-models/requirements.md
