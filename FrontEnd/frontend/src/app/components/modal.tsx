@@ -62,6 +62,10 @@ const getDateRange = (graphType: string) => {
       startDate.setFullYear(currentDate.getFullYear() - 5);
       endDate.setDate(currentDate.getDate() - 1);
       break;
+    case 'GreeksLandscape':
+      startDate.setDate(currentDate.getDate() + 1);
+      endDate.setFullYear(currentDate.getFullYear() + 1);
+      break;
     default:
       startDate.setDate(currentDate.getDate() + 1);
       endDate.setFullYear(currentDate.getFullYear() + 2);
