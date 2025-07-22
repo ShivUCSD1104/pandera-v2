@@ -192,6 +192,13 @@ class GreeksDataFetcher:
                 if time_to_expiry <= 0:
                     continue
                 
+                # Normalize option type (handle both 'call'/'put' and 'calls'/'puts')
+                option_type = option.get('type', 'call').lower()
+                if option_type == 'calls':
+                    option_type = 'call'
+                elif option_type == 'puts':
+                    option_type = 'put'
+                
                 greeks_data = GreeksData(
                     strike=float(option.get('strike', 0)),
                     expiry=expiry_date,
@@ -199,7 +206,7 @@ class GreeksDataFetcher:
                     underlying_price=options_chain.underlying_price,
                     risk_free_rate=risk_free_rate,
                     volatility=float(option.get('implied_volatility', 0.2)),
-                    option_type=option.get('type', 'call').lower()
+                    option_type=option_type
                 )
                 
                 greeks_data_list.append(greeks_data)
@@ -363,13 +370,20 @@ class GreeksDataFetcher:
                 else:
                     continue  # Skip if no valid price
                 
+                # Normalize option type (handle both 'call'/'put' and 'calls'/'puts')
+                option_type = record.option_type.lower()
+                if option_type == 'calls':
+                    option_type = 'call'
+                elif option_type == 'puts':
+                    option_type = 'put'
+                
                 # Calculate implied volatility
                 implied_vol = self._calculate_implied_volatility(
                     option_price=option_price,
                     underlying_price=underlying_price,
                     strike=float(record.strike),
                     time_to_expiry=time_to_expiry,
-                    option_type=record.option_type.lower(),
+                    option_type=option_type,
                     risk_free_rate=0.05
                 )
                 
@@ -377,7 +391,7 @@ class GreeksDataFetcher:
                 option_data = {
                     'strike': float(record.strike),
                     'expiry': record.expiration_date,
-                    'type': record.option_type.lower(),
+                    'type': option_type,
                     'bid': bid,
                     'ask': ask,
                     'last_price': last_price,

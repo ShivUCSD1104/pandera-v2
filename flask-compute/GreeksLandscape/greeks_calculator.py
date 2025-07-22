@@ -282,7 +282,13 @@ class GreeksCalculator:
             if greeks_data.option_type is None:
                 errors.append("Option type is required")
             elif greeks_data.option_type.lower() not in ['call', 'put']:
-                errors.append(f"Option type must be 'call' or 'put', got '{greeks_data.option_type}'")
+                # Handle common variations
+                if greeks_data.option_type.lower() == 'calls':
+                    greeks_data.option_type = 'call'
+                elif greeks_data.option_type.lower() == 'puts':
+                    greeks_data.option_type = 'put'
+                else:
+                    errors.append(f"Option type must be 'call' or 'put', got '{greeks_data.option_type}'")
             
             # Check for NaN or infinity values
             numeric_fields = [

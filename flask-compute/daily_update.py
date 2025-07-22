@@ -48,7 +48,8 @@ def update_option_data(ticker):
             exp_date = datetime.strptime(expiration_str, "%Y-%m-%d").date()
             
             option_type = option.get("type", "").lower()
-            mapped_type = "calls" if option_type == "call" else "puts" if option_type == "put" else option_type
+            # Store the original singular forms in the database
+            mapped_type = option_type  # Keep as 'call' or 'put'
 
             strike = float(option.get("strike", 0))
             bid = float(option.get("bid", 0))
