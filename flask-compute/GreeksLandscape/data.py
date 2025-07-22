@@ -220,13 +220,15 @@ class GreeksDataFetcher:
     
     def create_greeks_surface_data(
         self, 
-        greeks_data_list: List[GreeksData]
+        greeks_data_list: List[GreeksData],
+        option_type_filter: str = None
     ) -> Tuple[np.ndarray, np.ndarray, Dict[str, np.ndarray]]:
         """
         Create surface data arrays for 3D plotting.
         
         Args:
             greeks_data_list: List of GreeksData with calculated Greeks
+            option_type_filter: Filter by 'call', 'put', or None for both
             
         Returns:
             Tuple of (strikes_grid, expiries_grid, greeks_surfaces_dict)
@@ -235,9 +237,21 @@ class GreeksDataFetcher:
             if not greeks_data_list:
                 return np.array([]), np.array([]), {}
             
-            # Extract unique strikes and expiries
-            strikes = sorted(list(set(data.strike for data in greeks_data_list)))
-            expiries = sorted(list(set(data.time_to_expiry for data in greeks_data_list)))
+            # Filter by option type if specified
+            if option_type_filter:
+                filtered_data = [data for data in greeks_data_list if data.option_type.lower() == option_type_filter.lower()]
+                logger.info(f"Filtered to {len(filtered_data)} {option_type_filter} options out of {len(greeks_data_list)} total")
+            else:
+                filtered_data = greeks_data_list
+                logger.info(f"Using all {len(filtered_data)} options (calls and puts combined)")
+            
+            if not filtered_data:
+                logger.warning(f"No options found after filtering for type: {option_type_filter}")
+                return np.array([]), np.array([]), {}
+            
+            # Extract unique strikes and expiries from filtered data
+            strikes = sorted(list(set(data.strike for data in filtered_data)))
+            expiries = sorted(list(set(data.time_to_expiry for data in filtered_data)))
             
             # Create meshgrid
             strikes_grid, expiries_grid = np.meshgrid(strikes, expiries)
@@ -251,7 +265,7 @@ class GreeksDataFetcher:
             }
             
             # Fill in the Greeks values
-            for data in greeks_data_list:
+            for data in filtered_data:
                 try:
                     strike_idx = strikes.index(data.strike)
                     expiry_idx = expiries.index(data.time_to_expiry)

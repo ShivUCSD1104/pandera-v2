@@ -56,12 +56,14 @@ def compute():
             )
         elif graph_type == 'GreeksLandscape':
             from GreeksLandscape.main import generate_greeks_landscape_html
-            logger.info(f"Generating Greeks Landscape for ticker: {parameters.get('Ticker', 'AAPL')}, view: {parameters.get('Greeks View', 'All')}")
+            option_type = parameters.get('Option Type')  # 'call', 'put', or None for both
+            logger.info(f"Generating Greeks Landscape for ticker: {parameters.get('Ticker', 'AAPL')}, view: {parameters.get('Greeks View', 'All')}, option_type: {option_type}")
             fig_json = generate_greeks_landscape_html(
                 parameters.get('Ticker', 'AAPL'),
                 parameters.get('Greeks View', 'All'),
                 parameters.get('Start Date'),
-                parameters.get('End Date')
+                parameters.get('End Date'),
+                option_type
             )
             
             # Handle Greeks Landscape specific errors

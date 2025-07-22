@@ -27,7 +27,8 @@ def generate_greeks_landscape_html(
     ticker: str,
     greeks_view: str = 'All',
     start_date: Optional[str] = None,
-    end_date: Optional[str] = None
+    end_date: Optional[str] = None,
+    option_type: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Generate 3D Greeks landscape visualization with comprehensive error handling.
@@ -37,6 +38,7 @@ def generate_greeks_landscape_html(
         greeks_view: Which Greeks to display ('Delta', 'Gamma', 'Theta', 'Vega', 'All')
         start_date: Start date for options data (optional)
         end_date: End date for options data (optional)
+        option_type: Filter by option type ('call', 'put', or None for both)
         
     Returns:
         Dict containing Plotly figure JSON or error information with user-friendly messages
@@ -161,7 +163,10 @@ def generate_greeks_landscape_html(
         
         # Step 7: Create surface data for visualization
         try:
-            strikes_grid, expiries_grid, greeks_surfaces = data_fetcher.create_greeks_surface_data(valid_greeks)
+            strikes_grid, expiries_grid, greeks_surfaces = data_fetcher.create_greeks_surface_data(
+                valid_greeks, 
+                option_type_filter=option_type
+            )
             logger.info(f"Created surface data with {strikes_grid.size} data points")
         except Exception as e:
             logger.error(f"Error creating surface data: {str(e)}")
@@ -185,7 +190,8 @@ def generate_greeks_landscape_html(
                 greeks_surfaces, 
                 ticker, 
                 greeks_view,
-                options_chain.underlying_price
+                options_chain.underlying_price,
+                option_type
             )
             logger.info(f"Successfully created 3D plot for {ticker}")
         except Exception as e:
@@ -237,10 +243,11 @@ def _create_greeks_3d_plot(
     greeks_surfaces: Dict[str, Any],
     ticker: str,
     greeks_view: str,
-    underlying_price: float
+    underlying_price: float,
+    option_type: Optional[str] = None
 ) -> go.Figure:
     """
-    Create 3D surface plots for Greeks visualization with toggle functionality.
+    Create 3D surface plots for Greeks visualization.
     
     Args:
         strikes_grid: Meshgrid of strike prices
@@ -249,6 +256,7 @@ def _create_greeks_3d_plot(
         ticker: Stock ticker symbol
         greeks_view: Which Greeks to display
         underlying_price: Current underlying asset price
+        option_type: Option type filter ('call', 'put', or None for both)
         
     Returns:
         Plotly Figure object with 3D Greeks surfaces
@@ -286,6 +294,9 @@ def _create_greeks_3d_plot(
     # Add surface for each Greek
     for greek_name, config in greeks_config.items():
         if greek_name in greeks_surfaces:
+            # Calculate moneyness for hover data (Strike / Underlying Price)
+            moneyness_grid = strikes_grid / underlying_price
+            
             # Create hover text with detailed information
             hover_text = _create_hover_text(
                 strikes_grid, 
@@ -295,15 +306,12 @@ def _create_greeks_3d_plot(
                 underlying_price
             )
             
-            # Calculate moneyness for hover data
-            moneyness_grid = strikes_grid / underlying_price
-            
             # Add surface trace
             fig.add_trace(go.Surface(
                 x=strikes_grid,
                 y=expiries_grid * 365,  # Convert to days for better readability
                 z=greeks_surfaces[greek_name],
-                customdata=moneyness_grid,
+                customdata=moneyness_grid,  # Pass moneyness data for hover
                 colorscale=config['color'],
                 name=f"{config['name']} ({config['description']})",
                 hovertemplate=hover_text,
@@ -316,13 +324,19 @@ def _create_greeks_3d_plot(
                 )
             ))
     
-    # Add buttons for toggling between Greeks
-    buttons = _create_toggle_buttons(greeks_config, greeks_view)
+    # Create title with option type information
+    title_parts = [f"Options Greeks Landscape - {ticker} ({greeks_view})"]
+    if option_type:
+        title_parts.append(f"{option_type.title()} Options Only")
+    else:
+        title_parts.append("Calls & Puts Combined")
     
-    # Update layout with proper styling and controls
+    title_text = f"{title_parts[0]}<br><sub>{title_parts[1]} | Underlying Price: ${underlying_price:.2f}</sub>"
+    
+    # Update layout with proper styling (no toggle buttons)
     fig.update_layout(
         title=dict(
-            text=f"Options Greeks Landscape - {ticker}<br><sub>Underlying Price: ${underlying_price:.2f}</sub>",
+            text=title_text,
             x=0.5,
             font=dict(size=16)
         ),
@@ -344,34 +358,9 @@ def _create_greeks_3d_plot(
             ),
             aspectmode='cube'
         ),
-        updatemenus=[
-            dict(
-                type="buttons",
-                direction="left",
-                buttons=buttons,
-                pad={"r": 10, "t": 10},
-                showactive=True,
-                x=0.01,
-                xanchor="left",
-                y=1.02,
-                yanchor="top"
-            ),
-        ],
-        annotations=[
-            dict(
-                text="Select Greeks View:",
-                showarrow=False,
-                x=0.01,
-                y=1.08,
-                xref="paper",
-                yref="paper",
-                align="left",
-                font=dict(size=12)
-            )
-        ],
         width=900,
         height=700,
-        margin=dict(l=0, r=0, t=80, b=0)
+        margin=dict(l=0, r=0, t=60, b=0)
     )
     
     return fig
@@ -397,9 +386,6 @@ def _create_hover_text(
     Returns:
         HTML formatted hover template string
     """
-    # Calculate moneyness for additional context
-    moneyness_grid = strikes_grid / underlying_price
-    
     hover_template = (
         f"<b>{greek_name.title()} Surface</b><br>"
         "Strike: $%{x:.2f}<br>"
@@ -412,42 +398,3 @@ def _create_hover_text(
     return hover_template
 
 
-def _create_toggle_buttons(greeks_config: Dict[str, Dict], current_view: str) -> list:
-    """
-    Create toggle buttons for switching between different Greeks views.
-    
-    Args:
-        greeks_config: Configuration dictionary for Greeks
-        current_view: Currently selected view
-        
-    Returns:
-        List of button configurations for Plotly updatemenus
-    """
-    buttons = []
-    
-    # Add "All" button to show all Greeks
-    all_visible = [True] * len(greeks_config)
-    buttons.append(dict(
-        label="All Greeks",
-        method="update",
-        args=[
-            {"visible": all_visible},
-            {"title": "Options Greeks Landscape - All Greeks"}
-        ]
-    ))
-    
-    # Add individual Greek buttons
-    for i, (greek_name, config) in enumerate(greeks_config.items()):
-        visible = [False] * len(greeks_config)
-        visible[i] = True
-        
-        buttons.append(dict(
-            label=f"{config['name']} Only",
-            method="update", 
-            args=[
-                {"visible": visible},
-                {"title": f"Options Greeks Landscape - {config['name']} ({config['description']})"}
-            ]
-        ))
-    
-    return buttons
