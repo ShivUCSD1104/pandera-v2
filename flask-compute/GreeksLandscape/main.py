@@ -301,7 +301,7 @@ def _create_greeks_3d_plot(
                 "Strike: $%{x:.2f}<br>"
                 "Days to Expiry: %{y:.0f}<br>"
                 f"{config['name']}: %{{z:.4f}}<br>"
-                f"Moneyness: %{{x:.2f}} / {underlying_price:.2f} = {(1.0):.3f}<br>"
+                f"Moneyness: %{{x:.2f}} / {underlying_price:.2f} <br>"
                 "<extra></extra>"
             )
             
