@@ -295,16 +295,13 @@ def _create_greeks_3d_plot(
     # Add surface for each Greek
     for greek_name, config in greeks_config.items():
         if greek_name in greeks_surfaces:
-            # Calculate moneyness for hover data (Strike / Underlying Price)
-            moneyness_grid = np.array(strikes_grid / float(underlying_price), dtype=float)
-            
             # Create hover text with detailed information
             hover_text = (
                 f"<b>{config['name']} Surface</b><br>"
                 "Strike: $%{x:.2f}<br>"
                 "Days to Expiry: %{y:.0f}<br>"
                 f"{config['name']}: %{{z:.4f}}<br>"
-                "Moneyness: %{customdata:.3f}<br>"
+                f"Moneyness: %{{x:.2f}} / {underlying_price:.2f} = {(1.0):.3f}<br>"
                 "<extra></extra>"
             )
             
@@ -313,7 +310,6 @@ def _create_greeks_3d_plot(
                 x=strikes_grid,
                 y=expiries_grid * 365,  # Convert to days for better readability
                 z=greeks_surfaces[greek_name],
-                customdata=moneyness_grid,
                 colorscale=config['color'],
                 name=f"{config['name']} ({config['description']})",
                 hovertemplate=hover_text,
