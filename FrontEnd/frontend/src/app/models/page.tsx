@@ -64,6 +64,7 @@ export default function Models() {
       constraints: [
         { label: 'Ticker', options: ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'] },
         { label: 'Greeks View', options: ['Delta', 'Gamma', 'Theta', 'Vega', 'All'] },
+        { label: 'Option Type', options: ['Both', 'Call', 'Put'] },
         { 
           label: 'Time Period', 
           options: ['1 month', '3 months', '6 months', '1 year'] 

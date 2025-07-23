@@ -119,6 +119,12 @@ const Modal = ({ isOpen, onClose, cardData }: ModalProps) => {
           const { startDate, endDate } = getDateRange(cardData.type);
           parameters['Start Date'] = selections['Start Date'] || startDate.toISOString().split('T')[0];
           parameters['End Date'] = selections['End Date'] || endDate.toISOString().split('T')[0];
+        } else if (constraint.label === 'Option Type') {
+          const optionType = selections[constraint.label] || constraint.options[0];
+          if (optionType === 'Both') {
+          } else {
+            parameters['Option Type'] = optionType.toLowerCase();
+          }
         } else {
           parameters[constraint.label] = selections[constraint.label] || constraint.options[0];
         }
