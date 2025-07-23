@@ -59,7 +59,7 @@ export default function Models() {
     },
     {
       title: 'Options Greeks Landscape',
-      image: '/greeks-landscape.png',
+      image: '/graph4.png',
       type: 'GreeksLandscape',
       constraints: [
         { label: 'Ticker', options: ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'] },

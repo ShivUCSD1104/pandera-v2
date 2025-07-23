@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from typing import Dict, Any, Optional
 import logging
+import numpy as np
 
 from .data import GreeksDataFetcher
 from .greeks_calculator import GreeksCalculator
@@ -295,15 +296,16 @@ def _create_greeks_3d_plot(
     for greek_name, config in greeks_config.items():
         if greek_name in greeks_surfaces:
             # Calculate moneyness for hover data (Strike / Underlying Price)
-            moneyness_grid = strikes_grid / underlying_price
+            moneyness_grid = np.array(strikes_grid / float(underlying_price), dtype=float)
             
             # Create hover text with detailed information
-            hover_text = _create_hover_text(
-                strikes_grid, 
-                expiries_grid, 
-                greeks_surfaces[greek_name],
-                greek_name,
-                underlying_price
+            hover_text = (
+                f"<b>{config['name']} Surface</b><br>"
+                "Strike: $%{x:.2f}<br>"
+                "Days to Expiry: %{y:.0f}<br>"
+                f"{config['name']}: %{{z:.4f}}<br>"
+                "Moneyness: %{customdata:.3f}<br>"
+                "<extra></extra>"
             )
             
             # Add surface trace
@@ -311,7 +313,7 @@ def _create_greeks_3d_plot(
                 x=strikes_grid,
                 y=expiries_grid * 365,  # Convert to days for better readability
                 z=greeks_surfaces[greek_name],
-                customdata=moneyness_grid,  # Pass moneyness data for hover
+                customdata=moneyness_grid,
                 colorscale=config['color'],
                 name=f"{config['name']} ({config['description']})",
                 hovertemplate=hover_text,
@@ -371,7 +373,8 @@ def _create_hover_text(
     expiries_grid: Any, 
     greeks_values: Any,
     greek_name: str,
-    underlying_price: float
+    underlying_price: float,
+    moneyness_grid: Any
 ) -> str:
     """
     Create detailed hover text for Greeks surface plots.
@@ -391,7 +394,7 @@ def _create_hover_text(
         "Strike: $%{x:.2f}<br>"
         "Days to Expiry: %{y:.0f}<br>"
         f"{greek_name.title()}: %{{z:.4f}}<br>"
-        "Moneyness: %{customdata:.3f}<br>"
+        f"Moneyness: %{{x:.3f}}<br>"
         "<extra></extra>"
     )
     
