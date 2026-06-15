@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, Numeric, Date, DateTime, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import QueuePool
+from sqlalchemy.pool import NullPool
 import os
 import logging
 
@@ -9,14 +9,16 @@ logger = logging.getLogger(__name__)
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-# Configure connection pooling for performance optimization
+# NullPool: open a fresh connection per checkout and discard it on close.
+# This is the correct strategy for serverless Postgres (Neon) that scales to
+# zero — a long-lived QueuePool would hold connections that go stale when the
+# database suspends, causing timeouts on the next request. Connection reuse is
+# instead handled server-side by Neon's PgBouncer (use the -pooler host in
+# DATABASE_URL). pool_pre_ping still guards against any half-open sockets.
 engine = create_engine(
     DATABASE_URL,
-    poolclass=QueuePool,
-    pool_size=10,          # Number of connections to maintain in pool
-    max_overflow=20,       # Additional connections beyond pool_size
+    poolclass=NullPool,
     pool_pre_ping=True,    # Validate connections before use
-    pool_recycle=3600,     # Recycle connections after 1 hour
     echo=False             # Set to True for SQL debugging
 )
 

@@ -1,0 +1,23 @@
+# Render Blueprint for the Pandera Flask compute server (free tier).
+# Deploy: Render dashboard -> New -> Blueprint -> point at this repo.
+# All three secrets below are marked `sync: false`, so Render will prompt you
+# to enter them once in the dashboard (they are never committed).
+services:
+  - type: web
+    name: pandera-flask
+    runtime: python
+    plan: free
+    rootDir: flask-compute
+    buildCommand: pip install -r requirements.txt
+    # Single worker + a couple of threads keeps RAM under the 512 MB free cap
+    # while still handling the occasional concurrent request. $PORT is injected
+    # by Render; app.py already reads it but gunicorn binds it here.
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL          # Neon pooled connection string (host contains -pooler)
+        sync: false
+      - key: ALPHA_VANTAGE_API_KEY # only needed if you ever run daily_update.py here
+        sync: false
+      - key: API_KEY              # databento key for OrderFlowCanyon (paid live API)
+        sync: false

@@ -47,3 +47,5 @@ node_modules/csstype/README.md
 .kiro/specs/greeks-sentiment-models/design.md
 .kiro/specs/greeks-sentiment-models/tasks.md
 .kiro/specs/greeks-sentiment-models/requirements.md
+CLAUDE.md
+DEPLOYMENT.md

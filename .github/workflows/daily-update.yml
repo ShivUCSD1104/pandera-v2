@@ -1,0 +1,45 @@
+name: Daily data update
+
+# Refreshes the Neon Postgres DB with the latest Alpha Vantage data.
+# Replaces the always-on Railway cron — runs as a free GitHub Actions job.
+#
+# NOTE: GitHub disables scheduled workflows after 60 days with no repo activity,
+# which would silently stop data refreshes. Keep the repo active (commits) or
+# re-enable the workflow from the Actions tab if it goes dormant.
+on:
+  schedule:
+    - cron: '0 9 * * *' # 09:00 UTC daily (timing can drift a few minutes)
+  workflow_dispatch: {}   # allows manual runs from the Actions tab
+
+# Avoid overlapping runs if a manual run fires while a scheduled one is active.
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flask-compute
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: flask-compute/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ensure schema exists
+        # init_db() is idempotent (Base.metadata.create_all); self-heals a fresh DB.
+        run: python -c "from db import init_db; init_db()"
+
+      - name: Run daily update
+        run: python daily_update.py

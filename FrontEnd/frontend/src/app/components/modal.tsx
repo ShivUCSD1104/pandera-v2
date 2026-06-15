@@ -130,7 +130,9 @@ const Modal = ({ isOpen, onClose, cardData }: ModalProps) => {
         }
       });
 
-      const res = await axios.post('https://api.pandera.net/api/compute', { 
+      // Same-origin Next.js route handler (src/app/api/compute/route.ts),
+      // which forwards to the Flask compute server set via FLASK_URL.
+      const res = await axios.post('/api/compute', {
         parameters,
         graphType: cardData.type
       });
@@ -227,9 +229,14 @@ const Modal = ({ isOpen, onClose, cardData }: ModalProps) => {
           <div className="w-2/3 p-4 h-full">
             <div className="bg-fuchsia-100 rounded-lg h-full flex justify-center items-center overflow-auto">
               {loading ? (
-                <span style={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                  Loading{'.'.repeat(dotCount)}
-                </span>
+                <div className="flex flex-col items-center text-center px-6">
+                  <span style={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                    Computing surface{'.'.repeat(dotCount)}
+                  </span>
+                  <span className="text-sm text-gray-500 mt-2">
+                    The first run after a while can take ~30–50s while the compute server wakes up.
+                  </span>
+                </div>
               ) : error ? (
                 <span className="text-red-500">{error}</span>
               ) : plotData ? (

@@ -16,28 +16,28 @@ export default function Home() {
               Data Science. High Performance Compute. Econometrics. Puzzles & Strategy.
             </p>
             <div className="flex flex-row space-x-4">
-            <button className="px-8 py-4 rounded-lg bg-gradient-to-r from-amber-200 to-lime-200 text-gray-600 text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:shadow-inner hover:bg-none hover:border-2 hover:border-black">
+            <button className="px-8 py-4 rounded-lg bg-slate-800 text-white text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:bg-slate-700 hover:shadow-inner">
               <Link href="/models"><img
                   src="/chain.svg"
                   alt="Icon"
                   className={`h-8 w-8`}
                 /></Link>
             </button>
-            <button className="px-8 py-4 rounded-lg bg-gradient-to-r from-lime-200 to-teal-200 text-gray-600 text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:shadow-inner hover:bg-none hover:border-2 hover:border-black">
+            <button className="px-8 py-4 rounded-lg bg-slate-800 text-white text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:bg-slate-700 hover:shadow-inner">
               <Link href="/projects"><img
                   src="/cube2.svg"
                   alt="Icon"
                   className={`h-8 w-8`}
                 /></Link>
             </button>
-            <button className="px-8 py-4 rounded-lg bg-gradient-to-r from-teal-200 from-30% to-blue-200 text-gray-600 text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:shadow-inner hover:bg-none hover:border-2 hover:border-black">
+            <button className="px-8 py-4 rounded-lg bg-slate-800 text-white text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:bg-slate-700 hover:shadow-inner">
               <Link href="/research"><img
                   src="/cube.svg"
                   alt="Icon"
                   className={`h-8 w-8`}
                 /></Link>
             </button>
-            <button className="px-8 py-4 rounded-lg bg-gradient-to-r from-blue-200 from-30% to-fuchsia-200 text-gray-600 text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:shadow-inner hover:bg-none hover:border-2 hover:border-black">
+            <button className="px-8 py-4 rounded-lg bg-slate-800 text-white text-lg font-semibold transition-all duration-300 shadow-[2px_2px_4px_#bebebe] hover:bg-slate-700 hover:shadow-inner">
               <Link href="/code"><img
                   src="/terminal.svg"
                   alt="Icon"
@@ -63,7 +63,7 @@ export default function Home() {
             &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; ABOUT &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
               </h2>
               <div className="p-4 bg-white shadow-[8px_8px_16px_rgba(0,0,0,0.2)] flex flex-col items-center hover:shadow-inner hover:shadow-gray-400 rounded-lg space-y-4">
-                <h4 className="text-center">WE LOVE TO LEARN, RESEARCH, EXPIREMENT, BUILD, & SOLVE.
+                <h4 className="text-center">WE LOVE TO LEARN, RESEARCH, EXPERIMENT, BUILD, & SOLVE.
                 </h4>
                 <div className="flex flex-row space-x-4 align-center justify-center">
                 <h2 className="text-center align-center">Sound Like You? <br /> Scan & Join The Panderium</h2>
@@ -80,7 +80,7 @@ export default function Home() {
                     required
                   />
                   <button
-                    className="px-6 py-2 rounded-lg bg-gradient-to-r from-fuchsia-200 to-rose-200 text-gray-600 font-semibold shadow-[2px_2px_4px_#bebebe] hover:shadow-inner hover:bg-none hover:border-2 hover:border-black transition-all duration-300"
+                    className="px-6 py-2 rounded-lg bg-slate-800 text-white font-semibold shadow-[2px_2px_4px_#bebebe] hover:bg-slate-700 hover:shadow-inner transition-all duration-300"
                   >
                     Subscribe
                   </button>
